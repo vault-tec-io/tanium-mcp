@@ -1,0 +1,1077 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Asset API",
+    "version": "Cloud",
+    "description": "Tanium Asset REST API",
+    "termsOfService": "https://www.tanium.com/tanium-cloud-subscription-agreement",
+    "license": {
+      "name": "APIs are governed by the customer license agreement. See the End User License Agreement.",
+      "url": "https://www.tanium.com/tanium-cloud-subscription-agreement"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://customername-api.cloud.tanium.com/plugin/products/asset",
+      "description": "Tanium Cloud"
+    }
+  ],
+  "paths": {
+    "/v1/assets/{id}": {
+      "delete": {
+        "tags": [
+          "Asset"
+        ],
+        "summary": "deleteAsset",
+        "operationId": "delete-/v1/assets/{id}",
+        "description": "Delete asset - Permanently removes information on the specified endpoint from the Asset database. If the endpoint is online during a subsequent scheduled load, it will be re-added.",
+        "deprecated": false,
+        "parameters": [
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "path",
+            "name": "id",
+            "description": "Internal Asset id of the endpoint.",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "number",
+                      "description": "<p>The asset was successfully deleted</p>"
+                    }
+                  },
+                  "type": "object",
+                  "required": [
+                    "code"
+                  ]
+                },
+                "examples": {}
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "x-tanium-rbac": {
+          "requiredPermissions": [
+            "Asset Config Write"
+          ]
+        }
+      },
+      "get": {
+        "tags": [
+          "Asset"
+        ],
+        "summary": "getAsset",
+        "operationId": "get-/v1/assets/{id}",
+        "description": "Get asset - Retrieve structured information on a single endpoint from the Asset database",
+        "deprecated": false,
+        "parameters": [
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "path",
+            "name": "id",
+            "description": "Internal Asset id of the endpoint.",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "query",
+            "name": "viewId",
+            "description": "View id to use to retrieve data. If not provided, defaults to returning all attributes.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "response": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {},
+                          "description": "<p>Asset data. The properties returned depend on the view selected, and may be numbers, strings, booleans, or arrays of objects.</p>"
+                        }
+                      },
+                      "description": "",
+                      "required": [
+                        "data"
+                      ]
+                    }
+                  },
+                  "type": "object",
+                  "required": [
+                    "response"
+                  ]
+                },
+                "examples": {}
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "x-tanium-rbac": {
+          "requiredPermissions": [
+            "Asset Report Read"
+          ]
+        }
+      }
+    },
+    "/v1/assets": {
+      "get": {
+        "tags": [
+          "Asset"
+        ],
+        "summary": "getAssets",
+        "operationId": "get-/v1/assets",
+        "description": "Get assets - Retrieve structured information on multiple endpoints from the Asset database",
+        "deprecated": false,
+        "parameters": [
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "query",
+            "name": "viewId",
+            "description": "View id to use to retrieve data. If not provided, defaults to returning all attributes.",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "query",
+            "name": "minimumAssetId",
+            "description": "Filter out assets with internal asset id less than this id (default: 0).",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "query",
+            "name": "limit",
+            "description": "Return up to this many assets (default: 100, max: anything greater than 5000 will return 5000).",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "response": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {}
+                          },
+                          "description": "<p>Asset data. The properties returned depend on the view selected, and may be numbers, strings, booleans, or arrays of objects.</p>"
+                        },
+                        "meta": {
+                          "type": "object",
+                          "properties": {
+                            "endOfReader": {
+                              "type": "boolean",
+                              "description": "<p>When true, no more endpoints are available when calling this route with a higher minimumAssetId.</p>"
+                            },
+                            "message": {
+                              "type": "object",
+                              "properties": {
+                                "code": {
+                                  "type": "string",
+                                  "description": ""
+                                },
+                                "text": {
+                                  "type": "string",
+                                  "description": ""
+                                }
+                              },
+                              "description": "<p>An optional message describing the data in more details in unusual situations.</p>",
+                              "required": [
+                                "code",
+                                "text"
+                              ]
+                            },
+                            "nextAssetId": {
+                              "type": "number",
+                              "description": "<p>An id greater than the largest id in the returned data set. Omitted if the data set is empty. If paging through data, pass this value as the minimumAssetId in subsequent calls.  If used, may not result in additional data.</p>"
+                            }
+                          },
+                          "description": "<p>meta information about the asset data returned.</p>",
+                          "required": [
+                            "endOfReader",
+                            "message",
+                            "nextAssetId"
+                          ]
+                        }
+                      },
+                      "description": "",
+                      "required": [
+                        "data",
+                        "meta"
+                      ]
+                    }
+                  },
+                  "type": "object",
+                  "required": [
+                    "response"
+                  ]
+                },
+                "examples": {}
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "x-tanium-rbac": {
+          "requiredPermissions": [
+            "Asset Report Read"
+          ]
+        }
+      }
+    },
+    "/v1/attributes": {
+      "get": {
+        "tags": [
+          "Attribute"
+        ],
+        "summary": "getAttributes",
+        "operationId": "get-/v1/attributes",
+        "description": "Get attributes - Retrieve structured information on attributes from the Asset database",
+        "deprecated": false,
+        "parameters": [
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "query",
+            "name": "id",
+            "description": "Id for the attribute.",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "query",
+            "name": "entityId",
+            "description": "EntityID for the attribute.",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "attributeName",
+            "description": "A string to specify the attribute's name.",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "enabled",
+            "description": "If this attribute is enabled for reporting.",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "status",
+            "description": "The importing status of this attribute.",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "fieldName",
+            "description": "The corresponding field name of the attribute.",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "assetDataType",
+            "description": "The data type stored in the database.",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "displayName",
+            "description": "A string to specify the actual display name of the attribute.",
+            "required": true
+          }
+        ],
+        "responses": {},
+        "x-tanium-rbac": {
+          "requiredPermissions": [
+            "Asset Report Read"
+          ]
+        }
+      }
+    },
+    "/status": {
+      "get": {
+        "tags": [
+          "Status"
+        ],
+        "summary": "getStatus",
+        "operationId": "get-/status",
+        "description": "Get Service Status - Determine whether the Asset API is available for use",
+        "deprecated": false,
+        "parameters": [],
+        "responses": {},
+        "x-tanium-rbac": {
+          "requiredPermissions": [
+            "No Permission"
+          ]
+        }
+      }
+    },
+    "/v1/views": {
+      "post": {
+        "tags": [
+          "View"
+        ],
+        "summary": "createView",
+        "operationId": "post-/v1/views",
+        "description": "Create view",
+        "deprecated": false,
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "viewName": {
+                            "type": "string",
+                            "description": "<p>View display name.</p>"
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "<p>Description of the view.</p>"
+                          },
+                          "id": {
+                            "type": "number",
+                            "description": "<p>View unique identifier.</p>"
+                          },
+                          "createdAt": {
+                            "type": "number",
+                            "description": "<p>Date that view was first created.</p>"
+                          },
+                          "updatedAt": {
+                            "type": "number",
+                            "description": "<p>Date that view was last updated.</p>"
+                          },
+                          "definition": {
+                            "type": "object",
+                            "properties": {
+                              "filter": {
+                                "type": "object",
+                                "properties": {},
+                                "description": "<p>Default filter.</p>"
+                              },
+                              "relatedFilters": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "referenceName": {
+                                      "type": "string",
+                                      "description": "<p>Unique display name of the reference table used for this.</p>"
+                                    },
+                                    "filter": {
+                                      "type": "object",
+                                      "properties": {},
+                                      "description": "<p>Filter criteria.</p>"
+                                    },
+                                    "mustHave": {
+                                      "type": "boolean",
+                                      "description": "<p>Whether the asset must have values for this entity in order to be visible.</p>"
+                                    }
+                                  },
+                                  "required": [
+                                    "referenceName",
+                                    "filter",
+                                    "mustHave"
+                                  ]
+                                },
+                                "description": "<p>Array of filters on related items.</p>"
+                              },
+                              "attributes": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "number",
+                                      "description": "<p>Attribute unique identifier.</p>"
+                                    },
+                                    "entityId": {
+                                      "type": "number",
+                                      "description": "<p>Entity unique identifier.</p>"
+                                    },
+                                    "entityName": {
+                                      "type": "string",
+                                      "description": "<p>Entity display name.</p>"
+                                    },
+                                    "tableName": {
+                                      "type": "string",
+                                      "description": "<p>Entity table name in Asset database - ci_item for simple attributes, some other value for complex attributes, null for pending attributes.</p>"
+                                    },
+                                    "displayName": {
+                                      "type": "string",
+                                      "description": "<p>Attribute display name.</p>"
+                                    },
+                                    "fieldName": {
+                                      "type": "string",
+                                      "description": "<p>Attribute column name in Asset database - null for pending attributes.</p>"
+                                    },
+                                    "dataType": {
+                                      "type": "string",
+                                      "description": "<p>Attribute data type.</p>"
+                                    }
+                                  },
+                                  "required": [
+                                    "id",
+                                    "entityId",
+                                    "entityName",
+                                    "tableName",
+                                    "displayName",
+                                    "fieldName",
+                                    "dataType"
+                                  ]
+                                },
+                                "description": "<p>Array of attributes.</p>"
+                              },
+                              "userName": {
+                                "type": "string",
+                                "description": "<p>Username of the user that created this view.</p>"
+                              },
+                              "status": {
+                                "type": "string",
+                                "description": "<p>Status of view: whether it is ready for viewing with no stale data.</p>"
+                              },
+                              "reserved": {
+                                "type": "boolean",
+                                "description": "<p>Reserved for system use and may not be deleted or modified.</p>"
+                              }
+                            },
+                            "description": "<p>View definition details.</p>",
+                            "required": [
+                              "filter",
+                              "relatedFilters",
+                              "attributes",
+                              "userName",
+                              "status",
+                              "reserved"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "viewName",
+                          "description",
+                          "id",
+                          "createdAt",
+                          "updatedAt",
+                          "definition"
+                        ]
+                      },
+                      "description": "<p>Array of views.</p>"
+                    }
+                  },
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ]
+                },
+                "examples": {}
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "x-tanium-rbac": {
+          "requiredPermissions": [
+            "Asset Report Write"
+          ]
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "viewName": {
+                          "type": "string",
+                          "description": "<p>View display name.</p>"
+                        },
+                        "description": {
+                          "type": "string",
+                          "description": "<p>Description of the view.</p>"
+                        },
+                        "definition": {
+                          "type": "object",
+                          "properties": {
+                            "attributes": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "number",
+                                    "description": "<p>Attribute unique identifier.</p>"
+                                  }
+                                },
+                                "required": [
+                                  "id"
+                                ]
+                              },
+                              "description": "<p>Array of attributes.</p>"
+                            },
+                            "filter": {
+                              "type": "object",
+                              "properties": {},
+                              "description": "<p>Default filter.</p>"
+                            },
+                            "relatedFilters": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "referenceName": {
+                                    "type": "string",
+                                    "description": "<p>Unique display name of the reference table used for this.</p>"
+                                  },
+                                  "filter": {
+                                    "type": "object",
+                                    "properties": {},
+                                    "description": "<p>Filter criteria.</p>"
+                                  },
+                                  "mustHave": {
+                                    "type": "boolean",
+                                    "description": "<p>Whether the asset must have values for this entity in order to be visible.</p>"
+                                  }
+                                }
+                              },
+                              "description": "<p>Array of filters on related items.</p>"
+                            }
+                          },
+                          "description": "<p>View definition details.</p>",
+                          "required": [
+                            "attributes"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "viewName",
+                        "definition"
+                      ]
+                    },
+                    "description": "<p>View data.</p>"
+                  }
+                },
+                "type": "object",
+                "required": [
+                  "items"
+                ]
+              },
+              "examples": {}
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "View"
+        ],
+        "summary": "getViews",
+        "operationId": "get-/v1/views",
+        "description": "Get views",
+        "deprecated": false,
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "viewName": {
+                            "type": "string",
+                            "description": "<p>View display name.</p>"
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "<p>Description of the view.</p>"
+                          },
+                          "id": {
+                            "type": "number",
+                            "description": "<p>View unique identifier.</p>"
+                          },
+                          "createdAt": {
+                            "type": "number",
+                            "description": "<p>Date that view was first created.</p>"
+                          },
+                          "updatedAt": {
+                            "type": "number",
+                            "description": "<p>Date that view was last updated.</p>"
+                          },
+                          "definition": {
+                            "type": "object",
+                            "properties": {
+                              "filter": {
+                                "type": "object",
+                                "properties": {},
+                                "description": "<p>Default filter.</p>"
+                              },
+                              "relatedFilters": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "referenceName": {
+                                      "type": "string",
+                                      "description": "<p>Unique display name of the reference table used for this.</p>"
+                                    },
+                                    "filter": {
+                                      "type": "object",
+                                      "properties": {},
+                                      "description": "<p>Filter criteria.</p>"
+                                    },
+                                    "mustHave": {
+                                      "type": "boolean",
+                                      "description": "<p>Whether the asset must have values for this entity in order to be visible.</p>"
+                                    }
+                                  },
+                                  "required": [
+                                    "referenceName",
+                                    "filter",
+                                    "mustHave"
+                                  ]
+                                },
+                                "description": "<p>Array of filters on related items.</p>"
+                              },
+                              "attributes": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "number",
+                                      "description": "<p>Attribute unique identifier.</p>"
+                                    },
+                                    "entityId": {
+                                      "type": "number",
+                                      "description": "<p>Entity unique identifier.</p>"
+                                    },
+                                    "entityName": {
+                                      "type": "string",
+                                      "description": "<p>Entity display name.</p>"
+                                    },
+                                    "tableName": {
+                                      "type": "string",
+                                      "description": "<p>Entity table name in Asset database - ci_item for simple attributes, some other value for complex attributes, null for pending attributes.</p>"
+                                    },
+                                    "displayName": {
+                                      "type": "string",
+                                      "description": "<p>Attribute display name.</p>"
+                                    },
+                                    "fieldName": {
+                                      "type": "string",
+                                      "description": "<p>Attribute column name in Asset database - null for pending attributes.</p>"
+                                    },
+                                    "dataType": {
+                                      "type": "string",
+                                      "description": "<p>Attribute data type.</p>"
+                                    }
+                                  },
+                                  "required": [
+                                    "id",
+                                    "entityId",
+                                    "entityName",
+                                    "tableName",
+                                    "displayName",
+                                    "fieldName",
+                                    "dataType"
+                                  ]
+                                },
+                                "description": "<p>Array of attributes.</p>"
+                              },
+                              "userName": {
+                                "type": "string",
+                                "description": "<p>Username of the user that created this view.</p>"
+                              },
+                              "status": {
+                                "type": "string",
+                                "description": "<p>Status of view: whether it is ready for viewing with no stale data.</p>"
+                              },
+                              "reserved": {
+                                "type": "boolean",
+                                "description": "<p>Reserved for system use and may not be deleted or modified.</p>"
+                              }
+                            },
+                            "description": "<p>View definition details.</p>",
+                            "required": [
+                              "filter",
+                              "relatedFilters",
+                              "attributes",
+                              "userName",
+                              "status",
+                              "reserved"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "viewName",
+                          "description",
+                          "id",
+                          "createdAt",
+                          "updatedAt",
+                          "definition"
+                        ]
+                      },
+                      "description": "<p>Array of views.</p>"
+                    }
+                  },
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ]
+                },
+                "examples": {}
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "x-tanium-rbac": {
+          "requiredPermissions": [
+            "Asset Report Read"
+          ]
+        }
+      }
+    },
+    "/v1/views/{id}": {
+      "delete": {
+        "tags": [
+          "View"
+        ],
+        "summary": "deleteView",
+        "operationId": "delete-/v1/views/{id}",
+        "description": "Delete view",
+        "deprecated": false,
+        "parameters": [
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "path",
+            "name": "id",
+            "description": "View unique identifier.",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "number",
+                      "description": "<p>The view was deleted</p>"
+                    }
+                  },
+                  "type": "object",
+                  "required": [
+                    "code"
+                  ]
+                },
+                "examples": {}
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "x-tanium-rbac": {
+          "requiredPermissions": [
+            "Asset Report Write"
+          ]
+        }
+      },
+      "put": {
+        "tags": [
+          "View"
+        ],
+        "summary": "updateView",
+        "operationId": "put-/v1/views/{id}",
+        "description": "Update view",
+        "deprecated": false,
+        "parameters": [
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "path",
+            "name": "id",
+            "description": "View unique identifier.",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "viewName": {
+                          "type": "string",
+                          "description": "<p>View display name.</p>"
+                        },
+                        "description": {
+                          "type": "string",
+                          "description": "<p>Description of the view.</p>"
+                        },
+                        "id": {
+                          "type": "number",
+                          "description": "<p>View unique identifier.</p>"
+                        },
+                        "createdAt": {
+                          "type": "number",
+                          "description": "<p>Date that view was first created.</p>"
+                        },
+                        "updatedAt": {
+                          "type": "number",
+                          "description": "<p>Date that view was last updated.</p>"
+                        },
+                        "definition": {
+                          "type": "object",
+                          "properties": {
+                            "filter": {
+                              "type": "object",
+                              "properties": {},
+                              "description": "<p>Default filter.</p>"
+                            },
+                            "relatedFilters": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "referenceName": {
+                                    "type": "string",
+                                    "description": "<p>Unique display name of the reference table used for this.</p>"
+                                  },
+                                  "filter": {
+                                    "type": "object",
+                                    "properties": {},
+                                    "description": "<p>Filter criteria.</p>"
+                                  },
+                                  "mustHave": {
+                                    "type": "boolean",
+                                    "description": "<p>Whether the asset must have values for this entity in order to be visible.</p>"
+                                  }
+                                },
+                                "required": [
+                                  "referenceName",
+                                  "filter",
+                                  "mustHave"
+                                ]
+                              },
+                              "description": "<p>Array of filters on related items.</p>"
+                            },
+                            "attributes": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "number",
+                                    "description": "<p>Attribute unique identifier.</p>"
+                                  },
+                                  "entityId": {
+                                    "type": "number",
+                                    "description": "<p>Entity unique identifier.</p>"
+                                  },
+                                  "entityName": {
+                                    "type": "string",
+                                    "description": "<p>Entity display name.</p>"
+                                  },
+                                  "tableName": {
+                                    "type": "string",
+                                    "description": "<p>Entity table name in Asset database - ci_item for simple attributes, some other value for complex attributes, null for pending attributes.</p>"
+                                  },
+                                  "displayName": {
+                                    "type": "string",
+                                    "description": "<p>Attribute display name.</p>"
+                                  },
+                                  "fieldName": {
+                                    "type": "string",
+                                    "description": "<p>Attribute column name in Asset database - null for pending attributes.</p>"
+                                  },
+                                  "dataType": {
+                                    "type": "string",
+                                    "description": "<p>Attribute data type.</p>"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "entityId",
+                                  "entityName",
+                                  "tableName",
+                                  "displayName",
+                                  "fieldName",
+                                  "dataType"
+                                ]
+                              },
+                              "description": "<p>Array of attributes.</p>"
+                            },
+                            "userName": {
+                              "type": "string",
+                              "description": "<p>Username of the user that created this view.</p>"
+                            },
+                            "status": {
+                              "type": "string",
+                              "description": "<p>Status of view: whether it is ready for viewing with no stale data.</p>"
+                            },
+                            "reserved": {
+                              "type": "boolean",
+                              "description": "<p>Reserved for system use and may not be deleted or modified.</p>"
+                            }
+                          },
+                          "description": "<p>View definition details.</p>",
+                          "required": [
+                            "filter",
+                            "relatedFilters",
+                            "attributes",
+                            "userName",
+                            "status",
+                            "reserved"
+                          ]
+                        }
+                      },
+                      "description": "<p>View data.</p>",
+                      "required": [
+                        "viewName",
+                        "description",
+                        "id",
+                        "createdAt",
+                        "updatedAt",
+                        "definition"
+                      ]
+                    }
+                  },
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ]
+                },
+                "examples": {}
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "x-tanium-rbac": {
+          "requiredPermissions": [
+            "Asset Report Write"
+          ]
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "viewName": {
+                    "type": "string",
+                    "description": "<p>View display name.</p>"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "<p>Description of the view.</p>"
+                  },
+                  "definition": {
+                    "type": "boolean",
+                    "description": "<p>[relatedFilters[mustHave]] Whether the asset must have values for this entity in order to be visible.</p>"
+                  }
+                },
+                "type": "object",
+                "required": [
+                  "viewName",
+                  "definition",
+                  "definition",
+                  "definition",
+                  "definition"
+                ]
+              },
+              "examples": {}
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "session",
+        "description": "Tanium API Key  token-XXXXXXXX"
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKey": []
+    }
+  ]
+}
